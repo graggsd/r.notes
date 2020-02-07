@@ -1,0 +1,138 @@
+---
+title: "Basic Git Workflows"
+author: "SG"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Merge branch
+
+```{r, engine = 'bash'}
+# Change to branch that will receive merge
+git checkout master
+git merge development
+
+# Optionally, merge from master to development first to check for conflicts
+```
+
+# Delete branch
+
+```{r, engine = 'bash'}
+# Locally
+git branch -d branch_name
+# Remotely
+git push origin --delete {the_remote_branch}
+```
+
+To remove a local branch from your machine:
+
+git branch -d {the_local_branch} (use -D instead to force deleting the branch without checking merged status)
+
+To remove a remote branch from the server:
+
+
+
+# Create new branch
+
+```{r, engine = 'bash'}
+git checkout -b [name_of_your_new_branch]
+```
+
+To add to remote
+
+```{r, engine='bash'}
+git push origin new_branch
+```
+
+
+# Undoing work
+
+https://stackoverflow.com/questions/4114095/how-to-revert-git-repository-to-a-previous-commit
+https://blog.github.com/2015-06-08-how-to-undo-almost-anything-with-git/
+
+The following will create a new branch based on the specified commit identifier.
+
+```{r, engine = 'bash'}
+git checkout -b old-state 0d1d7fc32
+```
+
+Get rid of everything you've done since then
+
+```{r, engine = 'bash'}
+git reset --hard 0d1d7fc32
+```
+
+# Rename branch
+
+Rename your local branch.
+
+```{r, engine = 'bash'}
+
+# If you are on the branch you want to rename:
+git branch -m new-name
+
+# If you are on a different branch:
+git branch -m old-name new-name
+
+```
+
+**If you need to make changes to a remote branch as well:**
+
+Delete the old-name remote branch and push the new-name local branch.
+
+```{r, engine = 'bash'}
+git push origin :old-name new-name
+```
+
+Reset the upstream branch for the new-name local branch
+
+```{r, engine = 'bash'}
+# Switch to the branch
+git checkout new-name
+git push origin -u new-name
+
+```
+
+# Add all to git
+
+```{r, engine = 'bash'}
+git add --all
+git commit -am "<commit message>"
+git push
+```
+
+# Unstage all
+
+```{r, engine = 'bash'}
+git reset
+```
+
+# Resolve conflict
+
+```{r, engine='bash'}
+# Fix changes
+git add .
+git commit -m "Resolved merge conflict by incorporating both suggestions."
+```
+
+# Add a tag
+
+```
+git tag -a tagname
+```
+
+
+# Removing tags
+
+```{bash}
+# use the --delete option for remote
+git push --delete origin tagname
+
+# If you also need to delete the local tag, use:
+git tag --delete tagname
+
+```
+

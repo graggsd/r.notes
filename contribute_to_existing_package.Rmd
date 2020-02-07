@@ -1,0 +1,100 @@
+---
+title: "Contributing to Package Workflow"
+author: "SG"
+output: github_document
+---
+
+# Getting project repository
+
+## Fork target repo
+
+<https://guides.github.com/activities/forking/>
+
+1. (On github) Fork repository from package author
+
+## Clone to local development environment
+
+<https://help.github.com/articles/cloning-a-repository/>
+
+2. (On github) Clone to local dev space
+3. (On github) Go to your forked version of the repository
+4. (On github) Copy url
+5. (In RStudio) Open RStudio and set working directory as appropriate
+6. (In RStudio) In the git terminal enter:
+
+```{bash, eval = FALSE}
+
+# Using the url copied to clipboard above
+git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
+
+```
+
+## Integrating new features from separate package
+
+### Add new .R files with functions
+
+### Updates checklist
+
+Make sure the following elements are updated appropriately:
+
+* Import field in `DESCRIPTION`
+  * `devtools::use_package("name_of_package")`
+* Roxygen2 comments:
+  * `#' @importFrom pgk fun`
+  * `#' @import pgk`
+* testthat
+* Vignettes
+  * `devtools::use_vignette("my-vignette")`
+  * `devtools::build_vignettes()`
+* Build documentation
+  * `devtools::document()`
+
+## Testing
+
+* `devtools::test()`
+* `devtools::check()`
+
+## Create pull request
+
+* Go to your github directory containing the fork
+* Click pull request
+* Enter a description of why this pull should be incorporated into the 
+main branch.
+
+# Updating github fork
+
+[Configuring a remote for a fork](https://help.github.com/articles/configuring-a-remote-for-a-fork/)
+[Syncing a fork](https://help.github.com/articles/syncing-a-fork/)
+[Stack Overflow Ref](https://stackoverflow.com/questions/7244321/how-do-i-update-a-github-forked-repository)
+
+(In RStudio) In the git terminal enter:
+
+```{bash, eval = FALSE}
+
+# List the current configured remote repository for your fork.
+git remote -v
+# Specify a new remote upstream repository that will be synced with the fork.
+git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
+# Verify the new upstream repository you've specified for your fork.
+git remote -v
+# Fetch the branches and their respective commits from the upstream repository. 
+# Commits to master will be stored in a local branch, upstream/master.
+git fetch upstream
+# Check out your fork's local master branch.
+git checkout master
+# Merge the changes from upstream/master into your local master branch. 
+# This brings your fork's master branch into sync with the upstream repository, 
+# without losing your local changes.
+git merge upstream/master
+
+# -----------------------------------------------------------------------------
+# Alternatively, rewrite history of master branch to make pull requests as 
+# clean as possible:
+git rebase upstream/master
+# -----------------------------------------------------------------------------
+
+# push in order to push it to your own forked repository on GitHub
+git push -f origin master
+
+```
+

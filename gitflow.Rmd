@@ -1,0 +1,123 @@
+---
+title: "gitflow notes"
+author: "SG"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Source
+
+All information taken from:
+* <https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow>
+
+<https://stackoverflow.com/questions/3392392/when-is-the-right-time-to-delete-a-git-feature-branch>
+<https://gist.github.com/JamesMGreene/cdd0ac49f90c987e45ac>
+
+# Workflow
+
+## Initiate
+
+Create an empty develop branch locally and push it to the server:
+
+```{r, engine = 'bash'}
+git branch develop
+git push -u origin develop
+```
+
+* Note: Other developers should now clone the central repository and create a 
+tracking branch for develop.
+
+## Create a feature branch
+
+### Start
+
+```{r, engine = 'bash'}
+git checkout -b feature/MYFEATURE develop
+```
+
+### Finalize
+
+Merge the feature_branch into develop.
+
+```{r, engine = 'bash'}
+git checkout develop
+git merge --no-ff feature/MYFEATURE
+git branch -d feature/MYFEATURE
+```
+
+## Creating a release
+
+### Create a release branch
+
+```{r, engine = 'bash'}
+git checkout -b release/1.2.0 develop
+```
+
+### Release
+
+Merge to master and develop, delete the release branch.
+
+```{r, engine = 'bash'}
+git checkout master
+git merge --no-ff release/1.2.0
+git tag -a 1.2.0
+git checkout develop
+git merge --no-ff release/1.2.0
+git branch -d release/1.2.0
+```
+
+### Push to server
+
+```{r, engine = 'bash'}
+git push origin master
+git push origin develop
+git push origin --tags
+git push origin :release/1.2.0 #if pushed
+```
+
+
+# Versioning advice
+
+<http://r-pkgs.had.co.nz/description.html#version>
+
+* A released version number consists of three numbers, <major>.<minor>.<patch>. 
+For version number 1.9.2, 1 is the major number, 9 is the minor number, and 2 
+is the patch number. Never use versions like 1.0, instead always spell out the 
+three components, 1.0.0.
+
+* An in-development package has a fourth component: the development version. 
+This should start at 9000. For example, the first version of the package should
+be 0.0.0.9000. There are two reasons for this recommendation: first, it makes 
+it easy to see if a package is released or in-development, and the use of the 
+fourth place means that you’re not limited to what the next version will be. 
+0.0.1, 0.1.0 and 1.0.0 are all greater than 0.0.0.9000.
+
+* Increment the development version, e.g. from 9000 to 9001 if you’ve added an 
+important feature that another development package needs to depend on.
+
+# Hotfix
+
+```{r, engine='bash'}
+git checkout master
+git checkout -b hotfix/1.2.1 [commit]
+```
+
+```{r, engine='bash'}
+git checkout master
+git merge --no-ff hotfix/1.2.1
+git tag -a 1.2.1
+git checkout develop
+git merge --no-ff hotfix/1.2.1
+git branch -d hotfix/1.2.1
+```
+
+```{r, engine = 'bash'}
+git push origin master
+git push origin develop
+git push origin --tags
+git push origin :hotfix/1.2.1 # (if pushed)
+```
+

@@ -1,0 +1,338 @@
+---
+title: "Workflow Cheatsheet: Package Development"
+author: "SG"
+output: github_document
+---
+
+# Start Project
+
+* Start a new project
+  * devtools::create("path/to/package/pkgname")
+  * Or via "File" dropdown menu
+
+# Develop Project
+
+## Writing functions
+
+* Add functions by creating .R files within "/R"
+* Reload package using (ctrl-shift-L or devtools::load_all())
+
+## External functions
+
+* `devtools::use_package("name_of_package")` to add package to `import` field of
+**DESCRIPTION** 
+* Specify a version number manually in **DESCRIPTION**
+* <http://r-pkgs.had.co.nz/description.html#dependencies>
+
+### Using specific package functions
+
+* Specify function as `package::function` in R code
+* If implementing specific function numerous times, create a new file in "/R"
+with comment: `#' @importFrom pgk fun`
+* To utilize functions from entire package: `#' @import pgk`
+* Include `NULL` on the last line following the comment.
+* http://r-pkgs.had.co.nz/namespace.html
+
+* If you want a package to be attatched when yours is attatched, add it to the 
+`Depends` field of **DESCRIPTION**
+
+# Documenting
+
+## Generated via .R file using roxygen2
+
+### Example
+
+```{r}
+#' Generate an htmlTable from tidy data
+#'
+#' A wrapper script for \code{htmlTable} that will build an htmlTable using
+#' tidy data and mapping elements of the table to specific columns.
+#'
+#' All the details go here and they will be placed after the argument
+#' descriptions.
+#'
+#' @param x The tidy data used to build the table
+#' @param value The individual values which will fill each cell of the
+#' table
+#' @param header_td The column in \code{x} specifying column headings
+#' @param rnames_td The column in \code{x} specifying row names
+#' @param rgroup_td The column in \code{x} specifying row groups
+#' @param hidden_rgroup rgroups that will be hidden.
+#' @param cgroup1_td The column in \code{x} specifying the inner most column
+#'  groups
+#' @param cgroup2_td The column in \code{x} specifying the outer most column
+#'  groups
+#' @param tspanner_td The column in \code{x} specifying tspanner groups
+#' @param hidden_tspanner tspanners that will be hidden.
+#' @param debug_l Setting to true will print a message at certain points in the
+#' execution of the function. This is meant to only be a temporary feature
+#' as I learn to better utilizing existing debugging features in R Studio.
+#' @param ... Additional arguments that will be passed to the inner
+#' \code{htmlTable} function
+#' @return Returns html code that will build a pretty table
+#' @export
+#' @seealso \code{\link[htmlTable]{htmlTable}}
+#' @examples
+#' \dontrun{
+#' library(tidyverse)
+#' mtcars %>%
+#'     rownames_to_column %>%
+#'     select(rowname, cyl, gear, hp, mpg, qsec) %>%
+#'     gather(per_metric, value, hp, mpg, qsec) %>%
+#'     group_by(cyl, gear, per_metric) %>%
+#'     summarise(Mean = round(mean(value), 1),
+#'               SD = round(sd(value), 1),
+#'               Min = round(min(value), 1),
+#'               Max = round(max(value), 1)) %>%
+#'      gather(summary_stat, value, Mean, SD, Min, Max) %>%
+#'      ungroup %>%
+#'      mutate(gear = paste(gear, "Gears"),
+#'             cyl = paste(cyl, "Cylinders")) %>%
+#'      htmlTable_td(header_td = "gear",
+#'                   cgroup1_td = "cyl",
+#'                   cell_value = "value",
+#'                   rnames_td = "summary_stat",
+#'                   rgroup_td = "per_metric")
+#' }
+```
+
+### Easily forgotten tags
+
+```{r, eval = FALSE}
+# Use parameters from other function
+#' @inheritParams source_function
+
+#' @describeIn source_function
+
+# Reference other functions
+## If in different package
+#' @seealso \code{\link[package]{function}}
+## If in same package
+#' @seealso \code{\link{function}}
+
+# To highlight as in-line code
+#' \code{x}
+
+# To add additional sections
+#' @section SectionName:
+
+# Adding a link
+#' \code{\link{Summary}}
+
+# If you have a family of related functions where every function should link to 
+# every other function in the family
+#' @family aggregate functions
+
+# Ordered list
+#' \enumerate{
+#'   \item First item
+#'   \item Second item
+#' }
+
+# Unordered list
+#' \itemize{
+#'   \item First item
+#'   \item Second item
+#' }
+
+```
+
+## Documenting Functions
+
+* Build using
+  * ctrl-shift-D
+  * `devtools::document()`
+* http://r-pkgs.had.co.nz/man.html#man-functions
+
+## Documenting S3 generics and methods
+
+* Document the generic as you would a function
+* The methods don't necessarily need documentation
+
+## Overall package documentation
+* Generated using roxygen2 with stand-alone .R file in /R
+* Include `NULL` after comments
+* pg 51 of R Packages
+* http://r-pkgs.had.co.nz/man.html#man-packages
+
+# Edit the DESCRIPTION file
+
+* Complete using inline instructions (generated automatically)
+
+# Licensing
+
+`devtools::use_gpl3_license`
+`devtools::use_mit_license`
+* Licensing is a bit complicated: https://choosealicense.com/
+
+# Cleanup
+
+## CRAN
+* `running devtools::check()`
+
+## Other packages
+* `lintr` or `formatR` packages
+* `lintr::lint_package()`
+  * Adds markers to code and allow for manual cleanup
+
+# Placing under Git control
+
+* `devtools::use_git()`
+* OR: tools->project options-> verison control
+* Also, when starting a new package using the "File" dropdown menu, this can be 
+automatically implemented
+* Use the upper right Git panel to select files to stage and commit
+* http://r-pkgs.had.co.nz/git.html
+
+## Synchronizing with github
+* create a new repository on github
+* pull to local repository using the following bash commands:
+
+```{bash, eval = FALSE}
+
+git remote add origin git@github.com:graggsd/sgdemtbl.git
+git push -u origin master
+
+```
+
+* http://r-pkgs.had.co.nz/git.html#github-init
+
+## To update the remote repository
+
+* commit files
+* hit the push button
+
+# Testing
+
+* `devtools::use_testthat()`
+* Create a .R file for each test in `projDir/tests/testthat/`
+* Use described at the top by context("Use")
+
+```{r, eval = FALSE}
+context("complete")
+
+test_that("basic invocation works", {
+  df <- tibble(x = 1:2, y = 1:2, z = 3:4)
+  out <- complete(df, x, y)
+  expect_equal(nrow(out), 4)
+  expect_equal(out$z, c(3, NA, NA, 4))
+})
+# From tidyr
+# Other testing statements would follow
+
+```
+
+
+* Each test should evaluate specific functions and check a set of 
+expectations
+* See pg 74
+* <http://r-pkgs.had.co.nz/tests.html>
+* <https://github.com/tidyverse/tidyr/tree/master/tests>
+
+# Continuous Integration
+
+## Travis
+* Flip switch on travis account
+* `devtools::use_travis()`
+* Add image to `README` file to display build status on github page.
+* [![Build Status](https://travis-ci.org/tidyverse/dplyr.svg?branch=master)](https://travis-ci.org/tidyverse/dplyr)
+* Make sure to knit to generated `.md` file (ctrl+shift+k)
+
+## AppVeyor
+* Go to AppVeyor site and click on New Project
+* `devtools::use_appveyor()`
+* Add badge to README (project settings and the badges tab)
+* Ex: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/tidyverse/dplyr?branch=master&svg=true)](https://ci.appveyor.com/project/tidyverse/dplyr)
+
+# Using data
+
+* http://r-pkgs.had.co.nz/data.html#data-extdata
+
+## Exported data
+
+* `devtools::use_data_raw()`
+* place data into new directory
+* write script to process data
+* `devtools::use_data()`
+
+## Give users access to raw data
+
+* create inst/extdata and place data there
+* Include documentation on how to access data via 
+system.file("extdata", package = "packagename")
+
+## For use in testing
+
+* include small datasets directly in testing directory
+
+## To run tests 
+
+* `devtools::test()`
+* ctrl + shift + T 
+
+# Vignettes
+
+* `devtools::use_vignette("my-vignette")`
+* Modify `title`, `author` and `%\VignetteIndexEntry{Vignette Title}` fields
+* `devtools::build_vignettes()` (to knit markdown file)
+* OR Ctrl + Shift + K
+* http://r-pkgs.had.co.nz/vignettes.html
+
+# README
+
+* devtools::use_readme_rmd()
+* http://r-pkgs.had.co.nz/release.html#readme
+
+# Renaming a package
+
+<https://www.njtierney.com/post/2017/10/27/change-pkg-name/>
+
+# Part 1: Changing the R package name
+
+1. update your DESCRIPTION file package name
+2. update the NEWS.md
+3. update the name in the README file
+4. update the .RProj name
+5. update the folder name
+6. update your package-.R file
+7. Do a search (Cmd/Ctr + Shift + F) and look for mentions of your package name
+
+# Part 2: Changing the github name
+
+1. Now, with this final setp, what you want to do is go into your github repo, 
+go to settings, then change the repo name.
+
+2. You will then need to tell git where to look for your package online, 
+as the URL has changed.
+
+```{r, engine="bash"}
+# First, let’s show where the origin is.
+git remote show origin
+# Then, remove the origin, with
+git remote rm origin
+# Nothing will happen. That is good. Now, check that you have no origin file.
+git remote show origin
+# Great. Now, add the new origin.
+git remote add origin https://github.com/<USERNAME/ORGANISATION>/<YOUR-NEW-REPO-NAME>.git
+# Nothing will happen. This is good.
+# Now, check that the remote has been set.
+git remote show origin
+# Great, now make your changes, then add them, then do a commit.
+git add .
+git commit -m "updated package doco to be clearer about what the data is"
+# And then push them.
+git push
+# This is fine.
+# 
+# Before we can push these changes onto github, we need to tell it where to push to.
+# 
+# Do this with
+git push -u https://github.com/<USERNAME/ORGANISATION>/<YOUR-NEW-REPO-NAME>.git
+
+############ Alt --------------------
+
+# Changing the name of the Github.com repository is fortunately easy. 
+# Go to the URL of your Github package, click Settings near the top-right, 
+# change the name under "Repository name", and finally click Rename.
+```
+
