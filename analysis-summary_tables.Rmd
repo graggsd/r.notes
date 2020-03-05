@@ -1,0 +1,52 @@
+---
+title: "Summary Tables"
+author: "Stephen Gragg"
+date: "2/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(sgcodebook)
+```
+
+
+## Creating margin sums
+
+### dplyr
+
+```{r}
+ethnicity_x_race_n <- 
+  decoded_raw_dat %>% 
+  select(focus_pid, race, ethnicity) %>% 
+  group_by(race) %>% 
+  count(ethnicity) %>%
+  ungroup() %>% 
+  mutate(race = recode(race, 
+                       sort(unique(decoded_raw_dat$race)),
+                       c("A. Native", "Asian", "Multi-rac.", "Black", 
+                         "Declined", "Unknown", "Pacific Isl.", "White"))) %>% 
+  pivot_wider(names_from = race, values_from = n) %>% 
+  replace(is.na(.), 0) %>% 
+  mutate(total = rowSums(.[2:ncol(.)])) %>% 
+  bind_rows(select(.data = ., -ethnicity) %>% 
+              summarise_all(sum) %>%
+              mutate(ethnicity = "total"))
+```
+
+#### Other examples
+![](https://stackoverflow.com/questions/39507019/add-margin-row-totals-in-dplyr-chain)
+![](https://stackoverflow.com/questions/28873057/sum-across-multiple-columns-with-dplyr)
+![](https://stackoverflow.com/questions/57294176/sum-all-cells-to-the-right-of-a-column-in-each-row-using-dplyr)
+
+### base
+
+```{r}
+addmargins(table(decoded_raw_dat$ethnicity, decoded_raw_dat$race))
+
+```
+

@@ -1,0 +1,75 @@
+---
+title: "Rstudio Snippets"
+author: "Stephen Gragg"
+date: "03/02/2020"
+output: 
+    html_document:
+        number_sections: true
+        toc: true
+        toc_float: true
+        collapsed: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning=FALSE)
+```
+
+# Intro
+
+* Codesnippets executed in RStudio by typing snippet and hitting `SHIFT+TAB`
+* Below are custom snippets I have added to my install of RStudio
+* More information [here](https://support.rstudio.com/hc/en-us/articles/204463668-Code-Snippets)
+
+# R Markdown
+
+````markdown
+snippet link
+	[${1:linked_phrase}](${2:url})
+
+snippet img
+	![${1:title}](${2:url_or_path})
+	
+snippet rlink
+	[${1:linked_phrase}][${2:id}]
+	[${2:id}]: ${3:url} "${4:Title}"
+	
+snippet rimg
+	![${1:title}][${2:id}]
+	[${2:id}]: ${3:url_or_path} "${4:title}"
+
+snippet html
+	---
+	title: "${1:title}"
+	author: "Stephen Gragg"
+	date: "${2:date}"
+	output: 
+		html_document:
+			code_folding: hide
+			number_sections: true
+			toc: true
+			toc_float: true
+			collapsed: true
+	---
+	
+
+    `r ''````{r setup, include=FALSE}
+	knitr::opts_chunk\$set(message = FALSE, warning=FALSE)
+    ```
+
+snippet pdf
+	---
+	title: "${1:title}"
+	author: "Stephen Gragg"
+	date: "${2:date}"
+	output:
+	  pdf_document: default
+	  number_sections: true
+	  toc: true
+	  toc_depth: 1
+	---
+	
+    `r ''````{r setup, include=FALSE}
+	knitr::opts_chunk\$set(message = FALSE, echo=FALSE) 
+    ```
+
+````

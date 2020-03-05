@@ -4,18 +4,75 @@ author: "SG"
 output: github_document
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# System setup
+
+<https://r-pkgs.org/setup.html>
+
+## Install packages
+
+```{r}
+install.packages(c("devtools", "roxygen2", "testthat", "knitr"))
+```
+
+## Configure .Rprofile file
+
+```{r}
+# Add the following to .Rprofile (typically located in Users/name/Documents for
+# Windows users)
+if (interactive()) {
+  suppressMessages(require(testthat))
+}
+
+if (interactive()) {
+  suppressMessages(require(testthat))
+}
+
+options(
+  usethis.full_name = "Jane Doe",
+  usethis.description = list(
+    `Authors@R` = 'person("Jane", "Doe", email = "jane@example.com", role = c("aut", "cre"), 
+    comment = c(ORCID = "YOUR-ORCID-ID"))',
+    License = "MIT + file LICENSE",
+    Version = "0.0.0.9000"
+  ),
+  usethis.protocol  = "ssh"  
+)
+
+# =================================================
+
+# Alternatively paste after using the following command
+usethis::use_devtools()
+```
+
+
+## Install Rtools (not a package)
+  * <https://cran.r-project.org/bin/windows/Rtools/>
+  
+## Verify system prep
+
+```{r}
+devtools::has_devel()
+```
+
 # Start Project
 
-* Start a new project
-  * devtools::create("path/to/package/pkgname")
-  * Or via "File" dropdown menu
+```{r}
+usethis::create_package("path/to/package/pkgname")
+```
 
 # Develop Project
 
 ## Writing functions
 
-* Add functions by creating .R files within "/R"
-* Reload package using (ctrl-shift-L or devtools::load_all())
+Add functions by creating .R files within "/R"
+1. Write/edit function
+2. Reload package using (ctrl-shift-L or devtools::load_all())
+3. Test
+4. Repeat from 1 as needed
 
 ## External functions
 
@@ -204,30 +261,62 @@ git push -u origin master
 
 # Testing
 
-* `devtools::use_testthat()`
-* Create a .R file for each test in `projDir/tests/testthat/`
-* Use described at the top by context("Use")
+[Ref](https://r-pkgs.org/tests.html)
+[dplyr](https://github.com/tidyverse/dplyr/tree/master/tests/testthat)
 
-```{r, eval = FALSE}
-context("complete")
 
-test_that("basic invocation works", {
-  df <- tibble(x = 1:2, y = 1:2, z = 3:4)
-  out <- complete(df, x, y)
-  expect_equal(nrow(out), 4)
-  expect_equal(out$z, c(3, NA, NA, 4))
-})
-# From tidyr
-# Other testing statements would follow
+## Prep and test commands
+
+```{r}
+# To setup package to use testing
+usethis::use_testthat()
+
+# To add a test
+usethis::use_test()
+
+# To test during development
+devtools::test()
+# Alternatively Ctrl/Cmd + Shift + T
 
 ```
 
+## Creating tests
 
-* Each test should evaluate specific functions and check a set of 
-expectations
-* See pg 74
-* <http://r-pkgs.had.co.nz/tests.html>
-* <https://github.com/tidyverse/tidyr/tree/master/tests>
+### Notes
+* testthat relies on a hierarchical organization of:
+  1. Files: groups multiple related tests and is contained in a single .R file
+  2. Tests: assess a single expected outcome, but rely on multiple TRUE/FALSE
+  evaluations found in expectations
+  3. Expectations: individual tests, that when combined, theoretically prove 
+  the assumption of the test
+  
+### Commands
+  
+* `usethis::use_testthat()`
+
+### Example
+```{r}
+context("String length")
+library(stringr)
+
+test_that("str_length is number of characters", {
+  expect_equal(str_length("a"), 1)
+  expect_equal(str_length("ab"), 2)
+  expect_equal(str_length("abc"), 3)
+})
+
+test_that("str_length of factor is length of level", {
+  expect_equal(str_length(factor("a")), 1)
+  expect_equal(str_length(factor("ab")), 2)
+  expect_equal(str_length(factor("abc")), 3)
+})
+
+test_that("str_length of missing is missing", {
+  expect_equal(str_length(NA), NA_integer_)
+  expect_equal(str_length(c(NA, 1)), c(NA, 1))
+  expect_equal(str_length("NA"), 2)
+})
+```
 
 # Continuous Integration
 
@@ -336,3 +425,5 @@ git push -u https://github.com/<USERNAME/ORGANISATION>/<YOUR-NEW-REPO-NAME>.git
 # change the name under "Repository name", and finally click Rename.
 ```
 
+# Refs
+* https://r-pkgs.org/

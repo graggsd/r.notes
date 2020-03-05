@@ -1,0 +1,84 @@
+---
+title: "Tidyverse Notes"
+author: "Stephen Gragg"
+date: "2/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# dplyr
+
+### select
+
+Using a pre-defined variable to specify columns
+
+```{r, eval=FALSE}
+dat %>% 
+    select(c(cat_vars, cont_vars, "panther_mg", "sample_type", "Study_ID")) %>% 
+    mutate_at(vars(-cont_vars), as.character)
+```
+
+
+### mutate_at
+
+Using a pred-defined variable to specify columns
+
+```{r, eval=FALSE}
+dat %>% 
+    select(c(cat_vars, cont_vars, "panther_mg", "sample_type", "Study_ID")) %>% 
+    mutate_at(vars(-cont_vars), as.character)
+```
+
+### pivot_longer
+
+Excluding columns
+
+```{r, eval=FALSE}
+# One variable
+missingness_df <- 
+  cleaned_data %>% 
+  mutate_at(vars(-focus_pid, -attend_appt_focus, -intervention), is.na) %>% 
+  pivot_longer(-c("focus_pid", "attend_appt_focus", "intervention"))
+
+# Multiple variables
+missingness_df <- 
+  cleaned_data %>% 
+  mutate_at(vars(-focus_pid, -attend_appt_focus, -intervention), is.na) %>% 
+  pivot_longer(-c("focus_pid", "attend_appt_focus", "intervention"))
+```
+
+Specifying columns
+
+```{r}
+# Columns named in an external variable
+all_counts <- test_data %>%
+  pivot_longer(cols = columns_to_count)
+```
+
+
+# tidyr
+
+### complete
+
+Fill all combinations of a series of dates and values from a particular column:
+
+```{r}
+
+p <- dates_data %>%
+  pivot_longer(-focus_pid, names_to = "Group", values_to = "Date") %>%
+  group_by(Group, Date) %>%
+  summarize(Total = n()) %>%
+  drop_na() %>% 
+  complete(Date = seq.Date(from = min(Date, na.rm = TRUE), 
+                            to = max(Date, na.rm = TRUE), 
+                            by = "month"), 
+           Group, 
+           fill = list(Total = 0)) %>% 
+  ggplot(aes(x = Date, y = Total, color = Group)) +
+  geom_line() +
+  geom_point()
+
+```
+

@@ -1,0 +1,101 @@
+---
+title: "R Programming"
+author: "Stephen Gragg"
+date: "3/2/2020"
+output: 
+    html_document:
+        code_folding: hide
+        number_sections: true
+        toc: true
+        toc_float: true
+            collapsed: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning=FALSE)
+```
+
+# function as an argument
+
+[Ex 1](https://stackoverflow.com/questions/46940944/how-create-an-r-function-that-take-a-fun-as-parameter)
+
+```{r}
+myOp2 <- function(x, y, FUN = identity) FUN(x + y)
+
+myOp2(1, 2)
+## [1] 3
+
+myOp2(1, 3, sqrt)
+## [1] 2
+```
+
+[Ex 2](https://stackoverflow.com/questions/11885207/get-all-parameters-as-list)
+
+* `do.call()`
+[Example](https://mathewanalytics.com/2018/07/05/r-programming-notes-1/)
+[Example](https://www.stat.berkeley.edu/~s133/Docall.html)
+* Basically allows us to iterate over a series of arguments called to one
+function
+
+* `match.call()`
+* `match.fun()`
+
+# `...`
+
+* There are several ways to work with `...`
+
+## Capture evaluated `...`  [[Ref](http://adv-r.had.co.nz/Functions.html#function-arguments)]
+
+* `...` allows unmatched function arguments to be passed within the function
+as needed.
+* `...` in some applications, `...` is often easier to wrok with as a list 
+
+```{r, eval=FALSE}
+f <- function(...) {
+  names(list(...))
+}
+f(a = 1, b = 2)
+#> [1] "a" "b"
+```
+
+## Capture un-evaluated `...`
+
+### Basic use of `substitute`  [[Ref](http://adv-r.had.co.nz/Computing-on-the-language.html#capturing-expressions)]
+
+* When defining a new function, it is often helpful to allow input values
+from the new function be passed on directly to other functions within
+* However, when calling the function with a given input, by default, the input 
+is evaluated before it can be passed on, thus returning an unexpected result
+* Code can be captured prior to evaluation using the `substitute()` function.
+* In this way, input code of an argument can be passed straight to another 
+function within
+
+```{r}
+xyplot3 <- function(x, y, ...) {
+  substitute(xyplot(x ~ y, ...))
+}
+xyplot3(mpg, disp, data = mtcars, col = "red", aspect = "xy")
+#> xyplot(mpg ~ disp, data = mtcars, col = "red", aspect = "xy")
+```
+
+
+### Capture all unevaluated expressions in `...` [[Ref](http://adv-r.had.co.nz/Computing-on-the-language.html#capturing-dots)]
+
+* As in other cases, sometimes it is helpful to capture arguments within `...`
+as a list.
+* The following example allows you to do so without evaluating those arguments
+
+```{r}
+dots <- function(...) {
+  eval(substitute(alist(...)))
+}
+```
+
+[Example](https://www.r-bloggers.com/a-new-r-trick-for-me-at-least/)
+
+# Capture name of function
+
+```{r}
+as.character(substitute(base))
+```
+

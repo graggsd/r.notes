@@ -1,0 +1,48 @@
+---
+title: "Rstudio Notes"
+author: "Stephen Gragg"
+date: "03/02/2020"
+output: 
+    html_document:
+        number_sections: true
+        toc: true
+        toc_float: true
+        collapsed: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning=FALSE)
+```
+
+# snippets
+
+* Template below
+* "$" will designate where the cursor should go next after hitting `TAB`
+* "{1:varname}" will define the variables to be replaced
+* Typically, these are strung together as follows: "${1:varname}"
+* Every instanced of "$" that is not used in this manner must be escaped as
+follows: "\$"
+
+```
+snippet sm
+    setMethod("${1:gen}", ${2:"class"}, function(${3:obj}, ...) {
+        ${0}
+    })
+```
+
+# inline codeblocks
+
+* When attempting to render text that would usually generate a codeblock using
+`knitr`, it must be escaped with `n + 1`
+[ref](https://yihui.org/en/2017/11/knitr-verbatim-code-chunk/)
+
+`````markdown
+
+````markdown
+`r ''````{r}
+plot(cars)
+```
+````
+
+`````
+
